@@ -10,17 +10,20 @@ class ImageDownloadService1: NSObject, ObservableObject, URLSessionDownloadDeleg
     private var cancellables = Set<AnyCancellable>()
     
     private var session: URLSession?
-    private var imageState: ImageDownloadState?
-    var onProgress: ((Float) -> Void)?
+//    private var imageState: ImageDownloadState?
+    var onStart: ((Bool) -> Void)?
+    var onChange: ((Float) -> Void)?
+    var onComplete: ((UIImage) -> Void)?
     
     // Download image with progress tracking
-    func downloadImage(image: ImageDownloadState, onChange: ((Float) -> Void)?) {
-        self.imageState = image
-        self.onProgress = onChange
-        DispatchQueue.main.async {
-            self.imageState?.isInProgress = true
-        }
+    func downloadImage(image: ImageDownloadState, onStart: @escaping (Bool) -> Void, onChange: @escaping  (Float) -> Void, onComplete: @escaping  (UIImage) -> Void) {
+//        self.imageState = image
         
+        self.onStart = onStart
+        self.onChange = onChange
+        self.onComplete = onComplete
+        
+        onStart(true)
         let configuration = URLSessionConfiguration.default
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue.main)
         self.session = session
@@ -36,7 +39,7 @@ class ImageDownloadService1: NSObject, ObservableObject, URLSessionDownloadDeleg
         let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
 //        downloadProgress = progress
         
-        onProgress?(progress)
+        onChange?(progress)
         
         // Optional: You can debug and print progress here
 //        print("Download Progress: \(progress * 100)%", Double(progress*10))
@@ -48,15 +51,11 @@ class ImageDownloadService1: NSObject, ObservableObject, URLSessionDownloadDeleg
         
         print("Download completed")
         
-        DispatchQueue.main.async {
-            self.imageState?.isDownloaded = true
-            self.imageState?.isInProgress = false
-            self.imageState?.downloadProgress = 1.0
-        }
-        onProgress?(1.0)
-//        if let data = try? Data(contentsOf: location), let image = UIImage(data: data) {
+        
+        if let data = try? Data(contentsOf: location), let image = UIImage(data: data) {
 //            downloadedImage = image
-//        }
+            onComplete?(image)
+        }
     }
 }
 

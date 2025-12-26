@@ -19,31 +19,38 @@ struct CircularProgressView: View {
         VStack {
             
             ZStack {
+                Circle()
+                    .fill(.white.opacity(0.9))
+                    
+                    
+//                    .stroke(lineWidth: 4)
+//                    .foregroundColor(Color.white.opacity(0.9))
                 
                 Circle()
-                    .stroke(lineWidth: 6)
-                    .foregroundColor(Color.white.opacity(0.9))
-                    .frame(width: 40, height: 40)
+                        .stroke(
+                            Color.blue.opacity(0.2),
+                            style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                        )
                 
                 Circle()
                     .trim(from: 0, to: CGFloat(progress))
-                    .stroke(style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
+                    .stroke(Color.blue, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
                     .foregroundColor(.blue)
                     .rotationEffect(.degrees(-90))
-                    .frame(width: 40, height: 40)
                     .animation(.easeInOut(duration: 0.5), value: progress)
                 if isDownloaded{
                     Image(systemName: "checkmark.circle.fill")
                         .resizable()
-                        .frame(width: 28, height: 28)
-                        .foregroundStyle(.white)
-//                        .padding(.trailing, 4)
-//                        .padding(.top, 4)
+                        .scaledToFill()
+                        .foregroundStyle(.blue)
                 }
-                
             }
             
+            
+            
+            .shadow(radius: 0)
         }
+        
     
     }
     
@@ -53,7 +60,7 @@ struct CircularProgressView: View {
 
 #Preview {
     CircularProgressView(
-        progress: .constant(40.0),
-        isDownloaded: .constant(true)
+        progress: .constant(0.3),
+        isDownloaded: .constant(false)
     )
 }

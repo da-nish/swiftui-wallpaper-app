@@ -29,10 +29,11 @@ class ImageDownloadState: Identifiable, ObservableObject, Hashable {
     @Published var isDownloaded: Bool = false  // Flag to check if it's downloaded
     @Published var isInProgress: Bool = false  // Flag to check if it's downloaded
     
-    init(imageId: Int, imageUrl: URL, downloadUrl: URL) {
+    init(imageId: Int, imageUrl: URL, downloadUrl: URL, isDownloded: Bool = false) {
         self.imageId = imageId
         self.imageUrl = imageUrl
         self.downloadUrl = downloadUrl
+        self.isDownloaded = isDownloded
     }
     // Implementing the hash(into:) method for Hashable conformance
     func hash(into hasher: inout Hasher) {
@@ -59,6 +60,10 @@ class ImageListViewModel: ObservableObject{
     private var cancellables = Set<AnyCancellable>()
     private let apiService = APIService()
     
+    init() {
+        WallpaperDownloadService.shared.syncDownloadedWallpapers()
+    }
+    
     // Load initial set of images
     func loadImages() {
         print("images loading")
@@ -69,9 +74,14 @@ class ImageListViewModel: ObservableObject{
             self.isLoading = false
             switch result {
             case .success(let response):
-//                self.images.append(contentsOf: response.images)
+// self.images.append(contentsOf: response.images)
                 for item in response.images{
-                    let img = ImageDownloadState(imageId: item.imageId, imageUrl: URL(string: item.imageUrl)!, downloadUrl: URL(string: item.downloadUrl)!)
+                    let img = ImageDownloadState(
+                        imageId: item.imageId,
+                        imageUrl: URL(string: item.imageUrl)!,
+                        downloadUrl: URL(string: item.downloadUrl)!,
+                        isDownloded: WallpaperDownloadService.shared.isDownloadedBefore(String(item.imageId))
+                    )
                     self.images.append(img)
                 }
                 self.hasMore = response.hasMore

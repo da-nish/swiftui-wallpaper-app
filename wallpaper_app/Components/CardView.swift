@@ -42,6 +42,7 @@ struct CardView: View{
                     )
                     .padding(.trailing, 4)
                     .padding(.top, 4)
+                    .frame(width: 30, height: 30)
                 }
                 
             }

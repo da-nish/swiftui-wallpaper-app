@@ -43,6 +43,7 @@ struct ImageViewScreen: View {
                             progress: $imageItem.downloadProgress,
                             isDownloaded: $imageItem.isDownloaded
                         )
+                        .frame(width: 40, height: 40)
                         .padding(.trailing, 20)
                     }
                     else{
